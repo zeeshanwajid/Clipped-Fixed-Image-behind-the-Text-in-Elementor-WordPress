@@ -1,0 +1,127 @@
+JavaScript Code: 
+<script src="https://unpkg.co/gsap@3/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdpn.io/cpe/boomboom/pen.js?key=pen.js-c5539b87-20c5-d5c9-4288-6d584bf06b5c" crossorigin=""></script>
+<!-- unpkg -->
+<script src="https://unpkg.com/@barba/core"></script>
+
+<!-- jsdelivr -->
+<script src="https://cdn.jsdelivr.net/npm/@barba/core"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const svg = document.querySelector(".marquee svg");
+  const svgText = document.querySelector(".marquee clipPath text");
+  const clipEl = document.querySelector(".marquee clipPath");
+  const svgImg = document.querySelector(".marquee svg image");
+
+  const getTextWidth = () => svgText.getClientRects()[0].width;
+
+  const svgSizing = (svg, svgImg, svgText) => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    gsap.set([svg, svgImg], { width, height });
+    gsap.set(svgText, { height });
+  };
+
+  const getMarqueeTl = (svgText, clipEl) => {
+    svgSizing(svg, svgImg, svgText);
+    const tl = gsap
+      .timeline({ paused: true })
+      .to(clipEl, {
+        x: -getTextWidth(svgText) / 2,
+        duration: 24,
+        ease: "none",
+        repeat: -1
+      });
+    return tl;
+  };
+
+  const initMarqueeScrollTrigger = (svgText) => {
+    let tl = getMarqueeTl(svgText, clipEl);
+    ScrollTrigger.create({
+      id: "",
+      markers: true,
+      trigger: svgText,
+      start: "top bottom",
+      end: "bottom top",
+      onEnter: () => tl.play(),
+      onEnterBack: () => tl.play(),
+      onLeave: () => tl.pause(),
+      onLeaveBack: () => tl.pause(),
+      onRefresh: () => {
+        const isActive = tl.isActive;
+        tl.pause(0);
+        tl.kill();
+        tl = getMarqueeTl(svgText, clipEl);
+        isActive && tl.play();
+      }
+    });
+  };
+
+  const createMarquee = () => {
+    svgSizing(svg, svgImg);
+    initMarqueeScrollTrigger(svgText);
+  };
+
+  window.addEventListener('resize', () => {
+    ScrollTrigger.refresh(true);
+  });
+
+  createMarquee();
+});
+
+
+
+</script>
+
+
+
+
+CSS and HTML Code: 
+
+  
+<section class="marquee">
+  
+  <div class="marquee--text">
+    <svg viewBox="0 0 0 0">
+      <clipPath id="marquee--mask-marquee">
+        <text class="c-mask" alignment-baseline="central" y="50%" data-svg-origin="0 157.5">&nbsp;DISTRICT021 &nbsp;&nbsp;DISTRICT021 &nbsp;DISTRICT021 &nbsp;DISTRICT021 </text>
+      </clipPath>
+      <image class="marquee--img" xlink:href="https://district021.com/wp-content/uploads/2023/12/image-18.png" clip-path="url(#marquee--mask-marquee)" preserveAspectRatio="none"></image>
+    </svg>
+  </div>
+</section>
+
+<style>
+    .marquee {
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee svg {
+    font-family: "Azonix", Sans-serif;
+    font-size: 400px;
+    font-weight: 900;
+  overflow: visible;
+  width: 100%;
+  height: 100vh;
+}
+
+.marquee svg text {
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.gsap-marker-start{
+    display: none !important;
+}
+.gsap-marker-end{
+    display: none !important;
+}
+.gsap-marker-scroller-end{
+     display: none !important;
+}
+.gsap-marker-scroller-start{
+     display: none !important;
+}
+</style>
